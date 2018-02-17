@@ -1,0 +1,14 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    a(href='/')
+          button(type="button") Inicio
+    a(href='/users')
+          button(type="button") Users
+      a(href='/users/new')
+          button(type="button") new User
+    block content
+      

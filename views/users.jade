@@ -1,0 +1,16 @@
+extends layout
+block content
+  h1= title
+  div
+  table.table.table-striped
+    thead
+        tr
+            th Nº
+            th Name
+            th Email
+    tbody
+      each user, i in datos
+        tr
+            td #{i+1}
+            td #{user.name}
+            td #{user.email} 

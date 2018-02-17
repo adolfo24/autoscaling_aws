@@ -1,0 +1,41 @@
+version: "3.3"
+services:
+  api:
+    image: dooros/nodemongodb
+    links:
+      - db
+    ports:
+      - "80:3000"
+    volumes:
+      - aplicacion:/home
+    command: bash -c "node /home/app.js"
+    deploy:
+      replicas: 4
+  db:
+    image: dooros/nodemongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - data-db:/data/db
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+  visualizer:
+    image: dockersamples/visualizer
+    ports:
+      - "8080:8080"
+    stop_grace_period: 1m30s
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+volumes:
+  aplicacion:
+    driver_opts:
+      o: bind
+      device: /home/proyect/
+  data-db:
+    driver_opts:
+      device: /data/db/
+      o: bind

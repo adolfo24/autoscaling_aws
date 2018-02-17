@@ -1,0 +1,40 @@
+---
+- hosts: all
+  user: ubuntu
+  gather_facts: True
+  sudo: True
+  tasks:
+    - name: Update and upgrade apt packages
+      become: true
+      apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400 #One day
+    
+    - name: get nodejs 8
+      shell: curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+
+    - name: install nodejs
+      become: yes
+      apt: name=nodejs
+    - name: install build-essential
+      become: yes
+      apt: name=build-essential
+    - name: Ansible copy file to remote server
+      copy:
+        src: '{{playbook_dir}}'
+        dest: /home/ubuntu
+    - name: install modules
+      shell: cd /home/ubuntu/proyect && npm install
+
+    - copy:
+        src: api.service
+        dest: /etc/systemd/system/api.service
+
+    - name: install systemd
+      become: yes
+      apt: name=systemd
+    - name: start api
+      shell: sudo systemctl start api
+    - name: service enable api
+      shell: sudo systemctl enable api

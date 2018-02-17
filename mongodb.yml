@@ -1,0 +1,54 @@
+---
+- hosts: all
+  user: ubuntu
+  gather_facts: True
+  sudo: True
+  tasks:
+    - name: Update and upgrade apt packages
+      become: true
+      apt:
+        upgrade: yes
+
+    - name: MongoDB | Import public key
+      apt_key:
+        keyserver: hkp://keyserver.ubuntu.com:80
+        id: EA312927
+
+    - name: MongoDB | Add repository
+      apt_repository:
+        filename: '/etc/apt/sources.list.d/mongodb-org-3.2.list'
+        repo: 'deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse'
+        state: present
+        update_cache: yes
+
+    - name: MongoDB | Install MongoDB
+      sudo: yes
+      apt:
+        force: yes
+        name: mongodb-org
+        state: present
+        update_cache: yes
+
+    - name: creating directory 
+      shell: cd / && sudo mkdir data && cd data && sudo mkdir db
+    
+    - copy:
+        src: mongod.conf
+        dest: /etc/mongod.conf
+
+    - copy:
+        src: mongodb.service
+        dest: /etc/systemd/system/mongodb.service
+    
+    - name: install systemd
+      become: yes
+      apt: name=systemd
+
+    - name: start mongodb
+      shell: sudo systemctl start mongodb
+
+    - name: service enable mongodb
+      shell: sudo systemctl enable mongodb
+    - name: reset service mongod
+      shell: sudo service mongod restart
+     
